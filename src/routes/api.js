@@ -49,7 +49,7 @@ router.get('/cards', checkLogin, cardsController.getCards);
 // get cards by client name
 router.get('/cardlist/:clientNameOrCardNumber', checkLogin, cardsController.getCardsByClientName);
 // Edit
-router.patch('/cards/update/:cardID', checkLogin, cardsController.updateCardByID);
+  router.patch('/cards/update/:cardID', checkLogin, cardsController.updateCardByID);
 // archived
 router.get('/cards/archived', checkLogin, cardsController.getArchivedCardList);
 router.put('/cards/movetoarchive/:cardID', checkLogin, cardsController.moveToArchiveByCardID);
