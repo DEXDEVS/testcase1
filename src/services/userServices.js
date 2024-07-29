@@ -12,7 +12,7 @@ const addUserService = async (req) => {
   if (req.files && req.files.length > 0) {
     newUser = new User({
       ...req.body,
-      avatar: hostName+'/avatars/'+req.files[0].filename,
+      avatar: 'avatars/'+req.files[0].filename,
       password: hashedPassword,
     });
   } else {
