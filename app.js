@@ -36,7 +36,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 app.use(
-  '/avatars',
+  '/api/v1/avatars',
   express.static(path.join(__dirname, 'src', 'uploads', 'avatars'))
 );
 
