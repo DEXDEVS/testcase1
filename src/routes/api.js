@@ -8,6 +8,8 @@ const {
 const { addUser } = require('../controllers/usersController');
 const loginController= require('../controllers/loginController');
 const { checkLogin } = require('../middlewares/common/checkLogin');
+const excelFileUpload = require('../middlewares/excelFileUpload')
+const excelFileUploadController = require('../controllers/excelFileUploadController')
 const cardsController= require('../controllers/cardsController');
 const dashboardController= require('../controllers/dashboardController');
 const { getActivities } = require('../controllers/activitiesController');
@@ -42,6 +44,8 @@ router.post(
 router.get('/activities', checkLogin, getActivities);
 
 // Cards router
+// Upload file
+router.post('/cards/uploadFile', checkLogin,excelFileUpload, excelFileUploadController.getExcelData);
 // Add
 router.post('/cards/add', checkLogin, cardsController.addCards);
 // Get
@@ -63,8 +67,14 @@ router.put(
   checkLogin,
     cardsController.moveCardlistToAcrhiveByStatus
 );
+//Trash
+router.get('/cards/trashCardList', checkLogin, cardsController.getTrashCardList )
+router.put('/cards/moveToTrash/:cardID', checkLogin, cardsController.moveToTrashByID);
+router.put('/cards/moveToTrashByStatus/:status', checkLogin, cardsController.moveToTrashByStatus);
+router.patch('/cards/restoreFromTrash/:cardID', checkLogin, cardsController.restoreFromTrashByID);
+
 // Delete
 router.delete('/cards/delete/:cardID', checkLogin, cardsController.deleteCardByID);
-router.delete('/cardlist/delete/:status', checkLogin, cardsController.deleteCardListByStatus);
+router.delete('/trashList/deleteAll', checkLogin, cardsController.deleteAllTrashList);
 
 module.exports = router;

@@ -53,6 +53,8 @@ const cardSchema = new mongoose.Schema(
       default: 'ממתין למפעל',
     },
     archived: { type: Boolean, required: true, default: false },
+    isTrashed: { type: Boolean, required: true, default: false },
+
   },
   { timestamps: true, versionKey: false }
 );

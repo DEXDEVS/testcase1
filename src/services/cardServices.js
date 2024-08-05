@@ -11,6 +11,7 @@ const getCardsService = async () => {
     const MatchStage = {
       $match: {
         archived: { $ne: true },
+        isTrashed: { $ne: true },
       },
     };
     const JoinWithOrderStage= {$lookup:{from:"orders",localField:"orderID",foreignField:"_id",as:"order"}};
@@ -53,6 +54,7 @@ const getCardsByClientNameService = async (req) => {
     const MatchStage = {
       $match: {
         archived: { $ne: true },
+        isTrashed: { $ne: true },
         $or: [
           { 'client.name': clientNameOrCardNumber },
           { 'client.name': { $regex: clientNameOrCardNumber, $options: 'i' } },
@@ -96,8 +98,9 @@ const getCardsByClientNameService = async (req) => {
 };
 const getArchivedCardListService = async () => {
   try {
-    let MatchStage = { $match: { archived: true } };
-
+    let MatchStage = { $match: { archived: true, isTrashed: false } };
+    const JoinWithOrderStage= {$lookup:{from:"orders",localField:"orderID",foreignField:"_id",as:"order"}};
+    const UnwindOrderStage={$unwind:"$order"}
     const ProjectionStage = {
       $project: {
         orderID: 0,
@@ -116,6 +119,41 @@ const getArchivedCardListService = async () => {
     };
     const data = await Card.aggregate([
       MatchStage,
+      JoinWithOrderStage,
+      UnwindOrderStage,
+      AddExtraFieldsStage,
+      ProjectionStage,
+    ]);
+    return { status: 'success', data };
+  } catch (error) {
+    throw new createHttpError.InternalServerError();
+  }
+};
+const getTrashCardListService = async () => {
+  try {
+    const MatchStage = { $match: { isTrashed: true } };
+    const JoinWithOrderStage= {$lookup:{from:"orders",localField:"orderID",foreignField:"_id",as:"order"}};
+    const UnwindOrderStage={$unwind:"$order"}
+    const ProjectionStage = {
+      $project: {
+        orderID: 0,
+        _id: 0,
+        createdAt: 0,
+        updatedAt: 0,
+        'type._id': 0,
+        'client._id': 0,
+        'address._id': 0,
+      },
+    };
+    const AddExtraFieldsStage = {
+      $addFields: {
+        id: '$_id',
+      },
+    };
+    const data = await Card.aggregate([
+      MatchStage,
+      JoinWithOrderStage,
+      UnwindOrderStage,
       AddExtraFieldsStage,
       ProjectionStage,
     ]);
@@ -193,6 +231,19 @@ const moveToArchiveByCardIDService = async (req) => {
     throw new createHttpError(400, e.toString());
   }
 };
+const moveToTrashByIDService = async (req) => {
+  try {
+    let card_id = ObjectId.createFromHexString(req.params.cardID);
+    const data = await Card.findOneAndUpdate(
+      { _id: card_id },
+      { $set: { isTrashed: true } }
+    );
+    await addActivityService(req, data.cardNumber, 'Moved', `to Trash`);
+    return { status: 'success', message: 'Order moved to Trash' };
+  } catch (error) {
+    throw new createHttpError(400, e.toString());
+  }
+};
 const restoreSingleCardFromArchiveService = async (req) => {
   try {
     let card_id = ObjectId.createFromHexString(req.params.cardID);
@@ -206,11 +257,33 @@ const restoreSingleCardFromArchiveService = async (req) => {
     throw new createHttpError(400, e.toString());
   }
 };
+const restoreFromTrashByIDService = async (req) => {
+  try {
+    let card_id = ObjectId.createFromHexString(req.params.cardID);
+    const data = await Card.findOneAndUpdate(
+      { _id: card_id },
+      { $set: { isTrashed: false } }
+    );
+    await addActivityService(req, data.cardNumber, 'Restored', `from trash`);
+    return { status: 'success', message: 'Card restored from trash' };
+  } catch (error) {
+    throw new createHttpError(400, e.toString());
+  }
+};
 const moveCardlistToAcrhiveByStatusService = async (req) => {
   try {
     const status = req.params.status;
     await Card.updateMany({ status: status }, { $set: { archived: true } });
     return { status: 'success', message: 'Orders moved to archieved' };
+  } catch (error) {
+    throw new createHttpError(400, e.toString());
+  }
+};
+const moveToTrashByStatusService = async (req) => {
+  try {
+    const status = req.params.status;
+    await Card.updateMany({ status: status }, { $set: { isTrashed: true } });
+    return { status: 'success', message: 'Orders moved to Trash' };
   } catch (error) {
     throw new createHttpError(400, e.toString());
   }
@@ -224,10 +297,9 @@ const deleteCardByIDService = async (req) => {
     throw new createHttpError(400, e.toString());
   }
 };
-const deleteCardListByStatusService = async (req) => {
+const deleteAllTrashListService = async () => {
   try {
-    const status = req.params.status;
-    await Card.deleteMany({ status: status });
+    await Card.deleteMany({ isTrashed: true });
     return { status: 'success', message: 'Card List successfully deleted' };
   } catch (error) {
     throw new createHttpError(400, e.toString());
@@ -244,5 +316,9 @@ module.exports = {
   restoreSingleCardFromArchiveService,
   moveCardlistToAcrhiveByStatusService,
   deleteCardByIDService,
-  deleteCardListByStatusService,
+  deleteAllTrashListService,
+  moveToTrashByIDService,
+  restoreFromTrashByIDService,
+  getTrashCardListService,
+  moveToTrashByStatusService
 };

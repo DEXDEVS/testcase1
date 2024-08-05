@@ -27,6 +27,7 @@ const getPieChartDataService = async (req) => {
       {
         $match: {
           archived: false,
+          isTrashed: false,
           orderDate: {
             $gte: start,
             $lte: end,
@@ -81,6 +82,7 @@ const getTotalCardsCountService = async (req) => {
       {
         $match: {
           archived: { $ne: true },
+          isTrashed: { $ne: true },
           orderDate: {
             $gte: start,
             $lte: end,
@@ -121,12 +123,12 @@ const getTotalCardsCountService = async (req) => {
     throw new createHttpError.InternalServerError();
   }
 };
-
 const getNearestDeadlineOrdersService = async () => {
   try {
     let MatchStage = {
       $match: {
         archived: { $ne: true },
+        isTrashed: { $ne: true },
       },
     };
     const JoinWithOrderStage= {$lookup:{from:"orders",localField:"orderID",foreignField:"_id",as:"order"}};
@@ -195,6 +197,7 @@ const getLineChartDataService = async (req) => {
       {
         $match: {
           archived: { $ne: true },
+          isTrashed: { $ne: true },
           orderDate: {
             $gte: start,
             $lte: end,

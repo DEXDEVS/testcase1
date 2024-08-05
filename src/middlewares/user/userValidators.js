@@ -45,7 +45,7 @@ const addUserValidationHandler = function (req, res, next) {
     // remove uploaded files
     if (req.files?.length > 0) {
       const { filename } = req.files[0];
-      unlink(path.join(__dirname, `/../uploads/avatars/${filename}`), (err) => {
+      unlink(path.join(__dirname, `/../../../uploads/avatars/${filename}`), (err) => {
         if (err) console.log(err);
       });
     }
@@ -55,7 +55,6 @@ const addUserValidationHandler = function (req, res, next) {
     });
   }
 };
-
 module.exports = {
   addUserValidators,
   addUserValidationHandler,

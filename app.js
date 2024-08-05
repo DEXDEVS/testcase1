@@ -22,7 +22,6 @@ app.use(
       'https:://localhost:5173',
       'http://127.0.0.1:5173',
       'https://127.0.0.1:5173',
-      'https://store-management-crm.netlify.app',
     ],
     credentials: true,
   })
@@ -37,7 +36,7 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 app.use(
   '/api/v1/avatars',
-  express.static(path.join(__dirname, 'src', 'uploads', 'avatars'))
+  express.static(path.join(__dirname, 'uploads', 'avatars'))
 );
 
 // request rate limit
