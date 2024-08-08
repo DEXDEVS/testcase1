@@ -41,10 +41,8 @@ const parseDate = (value) => {
 
 const excelJsonToData = (jsonData) => {
   let productTypes;
-  const orderInfo = {
-    orderNumber: '',
-  };
   const result = {
+    orderNumber:'',
     orderDate: '',
     dueDate: '',
     client: {
@@ -75,7 +73,7 @@ const excelJsonToData = (jsonData) => {
       } else if (key === t['clientName']) {
         result.client.name = !isEmpty(value) ? value : '';
       } else if (key.includes(t['orderNumber'])) {
-        orderInfo.orderNumber = !isEmpty(value) ? value : '';
+        result.orderNumber = !isEmpty(value) ? value : '';
       } else if (key === t['phone1']) {
         result.client.phone1 = !isEmpty(value) ? value : '';
       } else if (key === t['phone2']) {
@@ -93,7 +91,7 @@ const excelJsonToData = (jsonData) => {
       }
     }
   }
-
+  if(!result.orderNumber)return [];
   let totalTypes;
   if (productTypes) {
     totalTypes = productTypes.split(',').map((item, index) => {
@@ -101,26 +99,27 @@ const excelJsonToData = (jsonData) => {
     });
     for (let type of totalTypes){
       if(!type.name || !type.typeID){
-        totalTypes = null;
+        totalTypes = [];
         break;
       }
     }
+  }else{
+    return [];
   }
-  let totalCards;
-  if (totalTypes?.length > 1) {
+  let totalCards = [];
+  if (totalTypes.length > 1) {
     totalCards = totalTypes.map((type) => {
       return {
         ...result,
-        cardNumber: orderInfo.orderNumber + `(${type.sID})`,
         type,
       };
     });
-  } else if (totalTypes?.length === 1) {
+  } else if (totalTypes.length === 1) {
     totalCards = [
-      { ...result, cardNumber: orderInfo.orderNumber, type: totalTypes[0] },
+      { ...result, type: totalTypes[0] },
     ];
   }
-  return { orderInfo, totalCards };
+  return totalCards;
 };
 
 const extractDataFromExcel =(path)=>{

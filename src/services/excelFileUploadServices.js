@@ -3,15 +3,11 @@ const {extractDataFromExcel} = require('../utils/extractDataFromExcel')
 const getExcelDataService = async (req) => {
     try {
         const {path} = req.files[0];
-        const {orderInfo, totalCards} =extractDataFromExcel(path);
-
-        if (!orderInfo || !orderInfo.orderNumber) {
-            throw new createHttpError(400,'Order number not found');
-        }
-        if(!totalCards){
+        const totalCards =extractDataFromExcel(path);
+        if(totalCards.length===0){
             throw new createHttpError(400,'Invalid format');
         }
-        return {orderInfo, totalCards};
+        return totalCards;
     } catch (error) {
         throw new createHttpError(error);
     }

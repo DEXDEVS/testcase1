@@ -131,20 +131,14 @@ const getNearestDeadlineOrdersService = async () => {
         isTrashed: { $ne: true },
       },
     };
-    const JoinWithOrderStage= {$lookup:{from:"orders",localField:"orderID",foreignField:"_id",as:"order"}};
-    let UnwindOrderStage={$unwind:"$order"}
     const ProjectionStage = {
       $project: {
-        orderID: 0,
         _id: 0,
         createdAt: 0,
         updatedAt: 0,
         'type._id': 0,
         'client._id': 0,
         'address._id': 0,
-        'order._id': 0,
-        'order.createdAt': 0,
-        'order.updatedAt': 0,
       },
     };
     const AddExtraFieldsStage = {
@@ -162,8 +156,6 @@ const getNearestDeadlineOrdersService = async () => {
     };
     const data = await Card.aggregate([
       MatchStage,
-      JoinWithOrderStage,
-      UnwindOrderStage,
       AddExtraFieldsStage,
       ProjectionStage,
       sortingStage,

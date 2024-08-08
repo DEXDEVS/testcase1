@@ -14,7 +14,6 @@ const typeSchema = {
     trim: true,
   },
   typeID: { type: String, required: true },
-  sID: { type: Number },
 };
 
 const clientSchema = {
@@ -32,9 +31,8 @@ const addressSchema = {
 
 const cardSchema = new mongoose.Schema(
   {
-    orderID: { type: mongoose.Types.ObjectId, required: true },
     orderDate: { type: Date, required: true },
-    cardNumber: { type: String, required: true, unique: true, trim: true },
+    orderNumber: { type: String, required: true, trim: true },
     dueDate: { type: Date, default: Date.now },
     type: { type: typeSchema, required: true },
     client: { type: clientSchema, required: true },

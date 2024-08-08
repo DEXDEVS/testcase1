@@ -3,8 +3,12 @@ const Activity = require('../models/Activity');
 const createHttpError = require('http-errors');
 const ObjectId = mongoose.Types.ObjectId;
 
-const addActivityService = async (req, cardNumbers, action, desc) => {
+const addActivityService = async (req, cards, action, desc) => {
   try {
+    let cardNumbers = cards;
+    if(!(typeof cards === 'string')){
+      cardNumbers = `${cards.orderNumber} (${cards.type.name} ${cards.type.typeID})`;
+    }
     const userID = ObjectId.createFromHexString(req.headers.userid);
     const data = await Activity.create({ userID, cardNumbers, action, desc });
     return { status: 'success', data };
