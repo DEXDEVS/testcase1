@@ -95,7 +95,6 @@ router.post('/order', async (req, res) => {
     phone2,
     address
   } = req.body;
-  console.log(req.body);
 
   if (!customerName || !installationDeadline || !orderDate || !type || !phone1 || !phone2 || !address) {
     return res.status(400).json({ message: 'All fields are required' });
