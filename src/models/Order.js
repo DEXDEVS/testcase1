@@ -8,7 +8,10 @@ const orderSchema = new mongoose.Schema(
     type: { type: String, required: true },
     phone1: { type: String, required: true },
     phone2: { type: String, required: true },
-    address: { type: String, required: true },
+    street: { type: String, required: true },
+    city: { type: String, required: true },
+    apartment: { type: String, required: true },
+    floor: { type: String, required: true },
   },
   { timestamps: true, versionKey: false }
 );
