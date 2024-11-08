@@ -93,10 +93,13 @@ router.post('/order', async (req, res) => {
     type,
     phone1,
     phone2,
-    address
+    city,
+    street,
+    apartment,
+    floor
   } = req.body;
 
-  if (!customerName || !installationDeadline || !orderDate || !type || !phone1 || !phone2 || !address) {
+  if (!customerName || !installationDeadline || !orderDate || !type || !phone1 || !phone2 || !city || !street || !apartment || !floor) {
     return res.status(400).json({ message: 'All fields are required' });
   }
 
@@ -107,7 +110,10 @@ router.post('/order', async (req, res) => {
     type,
     phone1,
     phone2,
-    address
+    city,
+    street,
+    apartment,
+    floor
   });
 
   await order.save();
@@ -121,7 +127,10 @@ router.post('/order', async (req, res) => {
       type,
       phone1,
       phone2,
-      address
+      city,
+      street,
+      apartment,
+      floor
     }
   });
 });
