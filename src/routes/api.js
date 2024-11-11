@@ -13,8 +13,6 @@ const excelFileUploadController = require('../controllers/excelFileUploadControl
 const cardsController = require('../controllers/cardsController');
 const dashboardController = require('../controllers/dashboardController');
 const { getActivities } = require('../controllers/activitiesController');
-const Order = require('../models/Order');
-const { route } = require('../../app');
 const router = express.Router();
 
 // process login
@@ -79,60 +77,6 @@ router.patch('/cards/restoreFromTrash/:cardID', checkLogin, cardsController.rest
 router.delete('/cards/delete/:cardID', checkLogin, cardsController.deleteCardByID);
 router.delete('/trashList/deleteAll', checkLogin, cardsController.deleteAllTrashList);
 
-
-router.get('/order', async (req, res) => {
-  const orders = await Order.find();
-  res.status(200).json(orders);
-});
-// Define the new order POST API
-router.post('/order', async (req, res) => {
-  const {
-    customerName,
-    installationDeadline,
-    orderDate,
-    type,
-    phone1,
-    phone2,
-    city,
-    street,
-    apartment,
-    floor
-  } = req.body;
-
-  if (!customerName || !installationDeadline || !orderDate || !type || !phone1 || !phone2 || !city || !street || !apartment || !floor) {
-    return res.status(400).json({ message: 'All fields are required' });
-  }
-
-  const order = new Order({
-    customerName,
-    installationDeadline,
-    orderDate,
-    type,
-    phone1,
-    phone2,
-    city,
-    street,
-    apartment,
-    floor
-  });
-
-  await order.save();
-
-  res.status(201).json({
-    message: 'Order created successfully',
-    order: {
-      customerName,
-      installationDeadline,
-      orderDate,
-      type,
-      phone1,
-      phone2,
-      city,
-      street,
-      apartment,
-      floor
-    }
-  });
-});
+router.post('/cards', cardsController.createCard);
 
 module.exports = router;

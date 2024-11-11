@@ -14,6 +14,7 @@ const {
   moveToTrashByStatusService,
   deleteAllTrashListService
 } = require('../services/cardServices');
+const Card = require('../models/Card');
 
 exports.getCards = async (req, res, next) => {
   try {
@@ -126,6 +127,18 @@ exports.moveToTrashByStatus = async (req, res, next) => {
   try {
     const result = await moveToTrashByStatusService(req);
     return res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+exports.createCard = async (req, res, next) => {
+  try {
+    const cardData = req.body;
+    const newCard = new Card(cardData);
+    const savedCard = await newCard.save();
+    res.status(201).json({ status: 'success', data: savedCard });
   } catch (error) {
     next(error);
   }
